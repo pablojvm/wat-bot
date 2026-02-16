@@ -6,7 +6,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import { getSession, saveSession, resetSession, insertLead } from "./db.js";
+import { pool, getSession, saveSession, resetSession, insertLead } from "./db.js";
 
 dotenv.config();
 
@@ -232,6 +232,39 @@ app.post("/webhook", async (req, res) => {
 
 /* --------------------------------- Health -------------------------------- */
 app.get("/", (_req, res) => res.send("OK"));
+
+app.get("/db/init", async (_req, res) => {
+  try {
+    // tabla sesiones (lead parcial por usuario)
+    await pool.query(`
+      create table if not exists sessions (
+        client_id text not null,
+        wa_from text not null,
+        lead jsonb not null default '{}'::jsonb,
+        updated_at timestamptz not null default now(),
+        primary key (client_id, wa_from)
+      );
+    `);
+
+    // tabla leads finales
+    await pool.query(`
+      create table if not exists leads (
+        id bigserial primary key,
+        ts timestamptz not null default now(),
+        client_id text not null,
+        wa_from text not null,
+        name text,
+        email text,
+        need text
+      );
+    `);
+
+    res.send("OK ✅ Tablas creadas");
+  } catch (e) {
+    console.error(e);
+    res.status(500).send(e.message);
+  }
+});
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`Webhook escuchando en http://localhost:${process.env.PORT || 3000}`);
