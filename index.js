@@ -5,8 +5,10 @@ import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-
 import { pool, getSession, saveSession, resetSession, insertLead } from "./db.js";
+import { runMigrations } from "./migrate.js";
+
+await runMigrations();
 
 dotenv.config();
 
