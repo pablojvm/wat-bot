@@ -1,0 +1,29 @@
+{
+  "1009753568887159": {
+    "id": "demo",
+    "systemPrompt": "Eres un asistente útil para WhatsApp. Responde breve y en español.",
+    "model": "gpt-4o-mini",
+    "temperature": 0.4,
+
+    "capabilities": {
+      "handoff": {
+        "enabled": true,
+        "keywords": ["humano", "agente", "persona", "soporte"],
+        "message": "Perfecto, te paso con una persona del equipo. ¿Cuál es tu nombre y el motivo?"
+      },
+      "leadCapture": {
+        "enabled": true,
+        "fields": ["name", "email", "need"],
+        "confirmMessage": "¡Gracias! He guardado tus datos. En breve te contactamos."
+      },
+      "faq": {
+        "enabled": true,
+        "items": [
+          { "q": "horario", "a": "Estamos de lunes a viernes de 9:00 a 18:00." },
+          { "q": "precio", "a": "Depende del servicio. Dime qué necesitas y te doy una estimación." },
+          { "q": "ubicacion", "a": "Trabajamos online y también en Madrid centro con cita previa." }
+        ]
+      }
+    }
+  }
+}
