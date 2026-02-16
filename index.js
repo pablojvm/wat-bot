@@ -6,7 +6,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import { getSessionLead, saveSessionLead, resetSession, insertLead } from "./db.js";
+import { getSession, saveSession, resetSession, insertLead } from "./db.js";
 
 dotenv.config();
 
@@ -163,13 +163,13 @@ app.post("/webhook", async (req, res) => {
       const fields = caps.leadCapture.fields || [];
 
       // cargamos sesión (persistente)
-      let lead = await getSessionLead(client.id, from);
+      let lead = await getSession(client.id, from);
 
       // name
       if (fields.includes("name") && !lead.name) {
         if (userText.length <= 40 && !isEmail(userText)) {
           lead.name = userText;
-          await saveSessionLead(client.id, from, lead);
+          await saveSession(client.id, from, lead);
         } else {
           await sendWhatsAppText(phoneNumberId, from, "¿Cómo te llamas?");
           return;
@@ -180,7 +180,7 @@ app.post("/webhook", async (req, res) => {
       if (fields.includes("email") && !lead.email) {
         if (isEmail(userText)) {
           lead.email = userText;
-          await saveSessionLead(client.id, from, lead);
+          await saveSession(client.id, from, lead);
         } else {
           await sendWhatsAppText(phoneNumberId, from, "¿Cuál es tu email?");
           return;
@@ -191,7 +191,7 @@ app.post("/webhook", async (req, res) => {
       if (fields.includes("need") && !lead.need) {
         if (!isEmail(userText) && userText.length > 1) {
           lead.need = userText;
-          await saveSessionLead(client.id, from, lead);
+          await saveSession(client.id, from, lead);
         } else {
           await sendWhatsAppText(phoneNumberId, from, "Cuéntame brevemente qué necesitas.");
           return;
@@ -205,7 +205,7 @@ app.post("/webhook", async (req, res) => {
 
       if (done && !lead._confirmed) {
         lead._confirmed = true;
-        await saveSessionLead(client.id, from, lead);
+        await saveSession(client.id, from, lead);
 
         await insertLead(client.id, from, {
           name: lead.name,
